@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
@@ -40,11 +41,13 @@ import helium314.keyboard.latin.define.DebugFlags
 import helium314.keyboard.latin.settings.Settings
 import helium314.keyboard.latin.utils.DeviceProtectedUtils
 import helium314.keyboard.latin.utils.ExecutorUtils
+import helium314.keyboard.latin.utils.Log
 import helium314.keyboard.latin.utils.UncachedInputMethodManagerUtils
 import helium314.keyboard.latin.utils.cleanUnusedMainDicts
 import helium314.keyboard.latin.utils.prefs
 import helium314.keyboard.settings.dialogs.ConfirmationDialog
 import helium314.keyboard.settings.dialogs.NewDictionaryDialog
+import helium314.keyboard.util.FoldStateDetector
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.io.BufferedOutputStream
 import java.io.File
@@ -52,6 +55,7 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import androidx.core.content.edit
 
 // todo: with compose, app startup is slower and UI needs some "warmup" time to be snappy
 //  maybe baseline profiles help?
@@ -91,10 +95,12 @@ class SettingsActivity : ComponentActivity(), SharedPreferences.OnSharedPreferen
                     val dictUri by dictUriFlow.collectAsState()
                     val crashReports by crashReportFiles.collectAsState()
                     val crashFilePicker = filePicker { saveCrashReports(it) }
-                    var showWelcomeWizard by rememberSaveable { mutableStateOf(
-                        !UncachedInputMethodManagerUtils.isThisImeCurrent(this, imm)
+                    var showWelcomeWizard by rememberSaveable {
+                        mutableStateOf(
+                            !UncachedInputMethodManagerUtils.isThisImeCurrent(this, imm)
                                 || !UncachedInputMethodManagerUtils.isThisImeEnabled(this, imm)
-                    ) }
+                        )
+                    }
                     if (spellchecker)
                         Scaffold(contentWindowInsets = WindowInsets.safeDrawing) { innerPadding ->
                             Column(Modifier.padding(innerPadding)) {
@@ -176,10 +182,50 @@ class SettingsActivity : ComponentActivity(), SharedPreferences.OnSharedPreferen
         paused = true
     }
 
+    private var foldDetector: FoldStateDetector? = null
     override fun onResume() {
+
+        val allPrefs = prefs.all
+        for ((key, value) in allPrefs) {
+            Log.d("FoldTest", "Pref[$key] = $value")
+        }
+
         super.onResume()
-        paused = false
+        prefs.edit { putBoolean(Settings.PREF_AUTO_FOLD_SPLIT, true) }
+
+        if (foldDetector == null) {
+            foldDetector = FoldStateDetector(this) { isFolded ->
+                val ctx = this // `this` here still refers to the activity
+                val prefs = ctx.prefs() // now valid
+
+                Log.d("FoldTest", "Detected fold state change: isFolded = $isFolded")
+
+                val autoSplitEnabled = prefs.getBoolean(Settings.PREF_AUTO_FOLD_SPLIT, false)
+                Log.d("FoldTest", "Auto-split enabled: $autoSplitEnabled")
+
+                if (!isFolded && autoSplitEnabled) {
+                    Log.d("FoldTest", "Applying SPLIT layout (unfolded + toggle enabled)")
+                    prefs.edit()
+                        .putBoolean(Settings.PREF_ENABLE_SPLIT_KEYBOARD, true)
+                        .putBoolean(Settings.PREF_ENABLE_SPLIT_KEYBOARD_LANDSCAPE, true)
+                        .apply()
+                    KeyboardSwitcher.getInstance().reloadKeyboard()
+                } else if (isFolded) {
+                    Log.d("FoldTest", "Reverting to NORMAL layout (folded)")
+                    prefs.edit()
+                        .putBoolean(Settings.PREF_ENABLE_SPLIT_KEYBOARD, false)
+                        .putBoolean(Settings.PREF_ENABLE_SPLIT_KEYBOARD_LANDSCAPE, false)
+                        .apply()
+                    KeyboardSwitcher.getInstance().reloadKeyboard()
+                }
+            }
+
+
+            lifecycle.addObserver(foldDetector!!)
+        }
     }
+
+
 
     fun setForceTheme(theme: String?, night: Boolean?) {
         if (paused) return

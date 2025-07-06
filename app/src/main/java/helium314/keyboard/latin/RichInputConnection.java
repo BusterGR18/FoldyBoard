@@ -1159,4 +1159,17 @@ public final class RichInputConnection implements PrivateCommandPerformer {
             | (requestImmediateCallback ? InputConnection.CURSOR_UPDATE_IMMEDIATE : 0);
         return mIC.requestCursorUpdates(cursorUpdateMode);
     }
+
+
+    public InputConnection getInputConnection() {
+        return mIC; // or whatever field holds the base InputConnection
+    }
+    public void deleteTextAroundCursor(final int beforeLength, final int afterLength) {
+        mIC.deleteSurroundingText(beforeLength, afterLength);
+    }
+
+
+
+
+
 }

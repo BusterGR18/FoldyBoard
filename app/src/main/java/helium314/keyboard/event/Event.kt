@@ -55,12 +55,16 @@ class Event private constructor(
         // The next event, if any. Null if there is no next event yet.
         val mNextEvent: Event?
         // This logic may need to be refined in the future
+
+
 ) {
 
     // Returns whether this is a function key like backspace, ctrl, settings... as opposed to keys
     // that result in input like letters or space.
     val isFunctionalKeyEvent: Boolean
         get() = NOT_A_CODE_POINT == mCodePoint || mMetaState != 0 // This logic may need to be refined in the future
+
+
 
     // Returns whether this event is for a dead character. @see {@link #FLAG_DEAD}
     val isDead: Boolean get() = 0 != FLAG_DEAD and mFlags
@@ -92,6 +96,12 @@ class Event private constructor(
             }
             throw RuntimeException("Unknown event type: $mEventType")
         }
+
+    @JvmName("getMetaState")
+    fun getMetaState(): Int {
+        return mMetaState
+    }
+
 
     companion object {
         // Should the types below be represented by separate classes instead? It would be cleaner
@@ -287,3 +297,5 @@ class Event private constructor(
         }
     }
 }
+
+

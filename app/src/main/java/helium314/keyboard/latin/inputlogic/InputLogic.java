@@ -57,6 +57,7 @@ import helium314.keyboard.latin.utils.StatsUtils;
 import helium314.keyboard.latin.utils.TextRange;
 import helium314.keyboard.latin.utils.TimestampKt;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.TreeSet;
@@ -1158,8 +1159,68 @@ public final class InputLogic {
      */
     private void handleBackspaceEvent(final Event event, final InputTransaction inputTransaction,
             final String currentKeyboardScript) {
+
+        Log.d("ShiftBackspace", "handleBackspaceEvent triggered");
         mSpaceState = SpaceState.NONE;
         mDeleteCount++;
+        // Determine if Shift is held
+/*
+        final int keyboardShiftMode = KeyboardSwitcher.getInstance().getKeyboardShiftMode();
+        final int actualCapsMode = getActualCapsMode(inputTransaction.getMSettingsValues(), keyboardShiftMode);
+        final boolean isShiftHeld = (actualCapsMode != WordComposer.CAPS_MODE_OFF);
+
+        final boolean shiftBackspaceRightEnabled = inputTransaction.getMSettingsValues().mShiftBackspaceDeleteRightEnabled;
+
+        if (!shiftBackspaceRightEnabled) {
+            Log.d("ShiftBackspace", "Shift+Backspace right-delete is disabled by setting");
+            return;
+        }
+
+        // Check if we should perform shift-delete
+        if (!mConnection.hasSelection()) {
+            final CharSequence afterCursor = mConnection.getTextAfterCursor(1, 0);
+
+
+            Log.d("ShiftBackspace", "shiftHeld=" + isShiftHeld + ", afterCursor=" + afterCursor);
+
+            if (isShiftHeld && shiftBackspaceRightEnabled && !TextUtils.isEmpty(afterCursor)) {
+                Log.d("ShiftBackspace", "Shift held — deleting character to the RIGHT: " + afterCursor.charAt(0));
+                mConnection.deleteTextAroundCursor(0, 1);
+                return;
+            } else {
+                Log.d("ShiftBackspace", "Default backspace (either shift not held, disabled, or no char after cursor)");
+            }
+        }*/
+
+        final int keyboardShiftMode = KeyboardSwitcher.getInstance().getKeyboardShiftMode();
+        final int actualCapsMode = getActualCapsMode(inputTransaction.getMSettingsValues(), keyboardShiftMode);
+        final boolean isShiftHeld = (actualCapsMode != WordComposer.CAPS_MODE_OFF);
+        final boolean shiftBackspaceRightEnabled = inputTransaction.getMSettingsValues().mShiftBackspaceDeleteRightEnabled;
+
+// Check if we should perform shift-delete
+        if (!mConnection.hasSelection()) {
+            final CharSequence afterCursor = mConnection.getTextAfterCursor(1, 0);
+            Log.d("ShiftBackspace", "shiftHeld=" + isShiftHeld + ", afterCursor=" + afterCursor);
+
+            if (isShiftHeld && shiftBackspaceRightEnabled && !TextUtils.isEmpty(afterCursor)) {
+                Log.d("ShiftBackspace", "Shift held — deleting character to the RIGHT: " + afterCursor.charAt(0));
+                mConnection.deleteTextAroundCursor(0, 1);
+                return;
+            } else {
+                Log.d("ShiftBackspace", "Default backspace (either shift not held, feature disabled, or no char after cursor)");
+                // Do not return here — let normal backspace proceed elsewhere
+            }
+        }
+
+
+
+
+
+
+
+
+
+
 
         // In many cases after backspace, we need to update the shift state. Normally we need
         // to do this right away to avoid the shift state being out of date in case the user types

@@ -129,6 +129,7 @@ public class SettingsValues {
     public final float mFontSizeMultiplierEmoji;
     public final boolean mEmojiKeyFit;
 
+
     // From the input box
     @NonNull
     public final InputAttributes mInputAttributes;
@@ -150,6 +151,7 @@ public class SettingsValues {
     public final SettingsValuesForSuggestion mSettingsValuesForSuggestion;
     public final boolean mIncognitoModeEnabled;
     public final boolean mLongPressSymbolsForNumpad;
+    public final boolean mShiftBackspaceDeleteRightEnabled;
 
     // User-defined colors
     public final Colors mColors;
@@ -166,6 +168,8 @@ public class SettingsValues {
 
         // Get the settings preferences
         mToolbarMode = Settings.readToolbarMode(prefs);
+        mShiftBackspaceDeleteRightEnabled = Settings.readShiftBackspaceDeleteRightEnabled();
+
         mToolbarHidingGlobal = prefs.getBoolean(Settings.PREF_TOOLBAR_HIDING_GLOBAL, Defaults.PREF_TOOLBAR_HIDING_GLOBAL);
         mAutoCap = prefs.getBoolean(Settings.PREF_AUTO_CAP, Defaults.PREF_AUTO_CAP) && ScriptUtils.scriptSupportsUppercase(mLocale);
         mVibrateOn = Settings.readVibrationEnabled(prefs);

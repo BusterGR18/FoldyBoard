@@ -83,6 +83,13 @@ fun AppearanceScreen(
             Settings.PREF_EMOJI_KEY_FIT else null,
         if (prefs.getInt(Settings.PREF_EMOJI_MAX_SDK, Defaults.PREF_EMOJI_MAX_SDK) >= 24)
             Settings.PREF_EMOJI_SKIN_TONE else null,
+        R.string.settings_category_foldable,
+        Settings.PREF_AUTO_FOLD_THEME,
+        Settings.PREF_AUTO_FOLD_SPLIT,
+        Settings.PREF_TREAT_HALF_OPENED_AS_FOLDED,
+
+
+
     )
     SearchSettingsScreen(
         onClickBack = onClickBack,
@@ -280,6 +287,24 @@ fun createAppearanceSettings(context: Context) = listOf(
         )
         ListPreference(setting, items, Defaults.PREF_EMOJI_SKIN_TONE) { KeyboardSwitcher.getInstance().setThemeNeedsReload() }
     },
+
+
+    Setting(context, Settings.PREF_AUTO_FOLD_THEME, R.string.pref_auto_fold_theme_title) {
+        SwitchPreference(it, false) { KeyboardSwitcher.getInstance().setThemeNeedsReload() }
+    },
+
+    Setting(context, Settings.PREF_AUTO_FOLD_SPLIT, R.string.pref_auto_fold_split_title) {
+        SwitchPreference(it, false) { KeyboardSwitcher.getInstance().reloadKeyboard() }
+    },
+
+    Setting(context, Settings.PREF_TREAT_HALF_OPENED_AS_FOLDED, R.string.pref_fold_half_opened_title) {
+        SwitchPreference(it, true) { KeyboardSwitcher.getInstance().reloadKeyboard() }
+    }
+
+
+
+
+
 )
 
 @Preview

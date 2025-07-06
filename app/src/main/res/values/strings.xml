@@ -905,4 +905,20 @@ New dictionary:
     <string name="custom_subtype">Custom subtype</string>
     <!-- Name for landscape orientation, used in various settings -->
     <string name="landscape">Landscape</string>
+    <string name="foldables_category">Foldables</string>
+    <string name="pref_auto_fold_theme_title">Auto theme switch</string>
+    <string name="pref_auto_fold_theme_summary">Switch between light and dark themes when folding/unfolding</string>
+    <string name="pref_auto_fold_split_title">Use split layout when unfolded</string>
+    <string name="pref_auto_fold_split_summary">Automatically use split keyboard layout when device is unfolded</string>
+    <string name="settings_category_foldable">Foldables</string>
+    <string name="pref_fold_half_opened_title">Treat Half-opened as folded</string>
+    <string name="pref_fold_half_opened_summary">When enabled, considers half-opened state as folded</string>
+    <string name="pref_enable_shift_backspace_delete_right">Shift+Backspace deletes forward</string>
+
+
+
+
+
+
+
 </resources>

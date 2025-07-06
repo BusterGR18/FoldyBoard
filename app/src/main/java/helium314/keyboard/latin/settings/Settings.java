@@ -69,6 +69,14 @@ public final class Settings implements SharedPreferences.OnSharedPreferenceChang
     public static final String PREF_SOUND_ON = "sound_on";
     public static final String PREF_SUGGEST_EMOJIS = "suggest_emojis";
     public static final String PREF_SHOW_EMOJI_DESCRIPTIONS = "show_emoji_descriptions";
+    //IMP SHIFT DELETE
+    public static final String PREF_ENABLE_SHIFT_BACKSPACE_DELETE_RIGHT = "enable_shift_backspace_delete_right";
+    public static boolean readShiftBackspaceDeleteRightEnabled() {
+        return mPrefs.getBoolean(PREF_ENABLE_SHIFT_BACKSPACE_DELETE_RIGHT, false);
+    }
+
+
+
     public static final String PREF_POPUP_ON = "popup_on";
     public static final String PREF_AUTO_CORRECTION = "auto_correction";
     public static final String PREF_MORE_AUTO_CORRECTION = "more_auto_correction";
@@ -181,7 +189,7 @@ public final class Settings implements SharedPreferences.OnSharedPreferenceChang
     public static final String PREF_LIBRARY_CHECKSUM = "lib_checksum";
 
     private Context mContext;
-    private SharedPreferences mPrefs;
+    private static SharedPreferences mPrefs;
     private SettingsValues mSettingsValues;
     private final ReentrantLock mSettingsValuesLock = new ReentrantLock();
 
@@ -201,6 +209,11 @@ public final class Settings implements SharedPreferences.OnSharedPreferenceChang
         add(PREF_DONT_SHOW_MISSING_DICTIONARY_DIALOG);
         add(PREF_SELECTED_SUBTYPE);
     }};
+    //foldable
+    public static final String PREF_AUTO_FOLD_SPLIT = "fold_split";
+    public static final String PREF_TREAT_HALF_OPENED_AS_FOLDED = "fold_half_opened_as_folded";
+    public static final String PREF_AUTO_FOLD_THEME = "fold_theme";
+
 
     public static Settings getInstance() {
         return sInstance;

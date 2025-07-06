@@ -38,6 +38,7 @@ import android.view.inputmethod.InlineSuggestion;
 import android.view.inputmethod.InlineSuggestionsRequest;
 import android.view.inputmethod.InlineSuggestionsResponse;
 import android.view.inputmethod.InputMethodInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
 
 import helium314.keyboard.accessibility.AccessibilityUtils;
@@ -793,6 +794,15 @@ public class LatinIME extends InputMethodService implements
                 mSettings.getCurrent(), switcher.getKeyboardSwitchState());
     }
 
+
+
+    //Backup overriding
+    /*private boolean isImeSuppressedByHardwareKeyboard() {
+        Log.d(TAG, "IME suppression overridden — always showing on-screen keyboard");
+        return false;
+    }
+*/
+
     @Override
     public void onConfigurationChanged(final Configuration conf) {
         SettingsValues settingsValues = mSettings.getCurrent();
@@ -890,6 +900,20 @@ public class LatinIME extends InputMethodService implements
         mHandler.onStartInputView(editorInfo, restarting);
         mStatsUtilsManager.onStartInputView();
     }
+
+    //Backup override IME
+//    @Override
+//    public void onStartInputView(EditorInfo info, boolean restarting) {
+//        super.onStartInputView(info, restarting);
+//        Log.d(TAG, "onStartInputView called — forcing IME show");
+//
+//        if (mInputView != null) {
+//            mInputView.requestFocus();
+//            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//            imm.showSoftInput(mInputView, InputMethodManager.SHOW_FORCED);
+//        }
+//    }
+
 
     @Override
     public void onFinishInputView(final boolean finishingInput) {
@@ -1334,13 +1358,19 @@ public class LatinIME extends InputMethodService implements
         return super.onShowInputRequested(flags, configChange);
     }
 
-    @Override
+   /* @Override
     public boolean onEvaluateInputViewShown() {
         if (mIsExecutingStartShowingInputView) {
             return true;
         }
         return super.onEvaluateInputViewShown();
+    }*/
+
+    @Override
+    public boolean onEvaluateInputViewShown() {
+        return BuildConfig.DEBUG || super.onEvaluateInputViewShown();
     }
+
 
     @Override
     public boolean onEvaluateFullscreenMode() {

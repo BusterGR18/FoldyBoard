@@ -58,6 +58,8 @@ fun PreferencesScreen(
         if (prefs.getBoolean(Settings.PREF_SOUND_ON, Defaults.PREF_SOUND_ON))
             Settings.PREF_KEYPRESS_SOUND_VOLUME else null,
         Settings.PREF_SHOW_EMOJI_DESCRIPTIONS,
+        Settings.PREF_ENABLE_SHIFT_BACKSPACE_DELETE_RIGHT,
+
         R.string.settings_category_additional_keys,
         Settings.PREF_SHOW_NUMBER_ROW,
         if (SubtypeSettings.getEnabledSubtypes(true).any { it.locale().language in localesWithLocalizedNumberRow })
@@ -119,6 +121,9 @@ fun createPreferencesSettings(context: Context) = listOf(
         SwitchPreference(it, Defaults.PREF_SHOW_EMOJI_DESCRIPTIONS) {
             KeyboardSwitcher.getInstance().reloadKeyboard()
         }
+    },
+    Setting(context, Settings.PREF_ENABLE_SHIFT_BACKSPACE_DELETE_RIGHT, R.string.pref_enable_shift_backspace_delete_right) {
+        SwitchPreference(it, false) { KeyboardSwitcher.getInstance().reloadKeyboard()}
     },
     Setting(context, Settings.PREF_ENABLE_CLIPBOARD_HISTORY,
         R.string.enable_clipboard_history, R.string.enable_clipboard_history_summary)
