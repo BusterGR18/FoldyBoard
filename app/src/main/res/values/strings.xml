@@ -914,6 +914,29 @@ New dictionary:
     <string name="pref_fold_half_opened_title">Treat Half-opened as folded</string>
     <string name="pref_fold_half_opened_summary">When enabled, considers half-opened state as folded</string>
     <string name="pref_enable_shift_backspace_delete_right">Shift+Backspace deletes forward</string>
+    <string name="pref_force_ime_show">Force on-screen keyboard (even with physical keyboard)</string>
+    <string name="customize_background_opacity">Customize Background Opacity</string>
+    <string name="customize_background_opacity_portrait">Background Opacity (Portrait)</string>
+    <string name="customize_background_opacity_landscape">Background Opacity (Landscape)</string>
+    <string name="customize_background_opacity_night_portrait">Background opacity (night, portrait)</string>
+    <string name="customize_background_opacity_night_landscape">Background opacity (night, landscape)</string>
+    <string name="customize_background_brightness">Customize background brightness</string>
+    <string name="customize_background_brightness_day_port">Day Portrait Brightness</string>
+    <string name="customize_background_brightness_day_land">Day Landscape Brightness</string>
+    <string name="customize_background_brightness_night_port">Night Portrait Brightness</string>
+    <string name="customize_background_brightness_night_land">Night Landscape Brightness</string>
+    <string name="day_portrait">Day Portrait</string>
+    <string name="day_landscape">Day Landscape</string>
+    <string name="night_portrait">Night Portrait</string>
+    <string name="night_landscape">Night Landscape</string>
+
+
+
+
+
+
+
+
 
 
 

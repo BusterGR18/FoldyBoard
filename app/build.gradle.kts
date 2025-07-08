@@ -21,12 +21,17 @@ android {
         proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
 
+
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = false
             isDebuggable = false
             isJniDebuggable = false
+            signingConfig = signingConfigs.getByName("debug") // ✅ use debug config
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
         create("nouserlib") { // same as release, but does not allow the user to provide a library
             isMinifyEnabled = true
@@ -131,5 +136,7 @@ dependencies {
     testImplementation("androidx.test:core:1.6.1")
 
     implementation("androidx.window:window:1.4.0")
+    implementation("com.github.yalantis:ucrop:2.2.9")
+    implementation("androidx.appcompat:appcompat:1.7.1")
 
 }

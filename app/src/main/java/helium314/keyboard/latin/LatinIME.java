@@ -1366,10 +1366,25 @@ public class LatinIME extends InputMethodService implements
         return super.onEvaluateInputViewShown();
     }*/
 
-    @Override
+    /*@Override
     public boolean onEvaluateInputViewShown() {
         return BuildConfig.DEBUG || super.onEvaluateInputViewShown();
+    }*/
+
+    @Override
+    public boolean onEvaluateInputViewShown() {
+        if (mIsExecutingStartShowingInputView) {
+            return true;
+        }
+
+        if (mSettings.readForceImeShowEnabled()) {
+            Log.d(TAG, "IME suppression overridden — user setting enabled");
+            return true;
+        }
+
+        return super.onEvaluateInputViewShown();
     }
+
 
 
     @Override

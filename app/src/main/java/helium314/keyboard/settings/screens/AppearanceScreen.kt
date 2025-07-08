@@ -3,6 +3,7 @@ package helium314.keyboard.settings.screens
 
 import android.content.Context
 import android.os.Build
+import android.preference.PreferenceManager
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -40,6 +41,9 @@ import helium314.keyboard.settings.preferences.CustomFontPreference
 import helium314.keyboard.settings.preferences.MultiSliderPreference
 import helium314.keyboard.settings.preferences.TextInputPreference
 import helium314.keyboard.settings.previewDark
+import helium314.keyboard.settings.preferences.AddBrightnessSlider
+
+
 
 @Composable
 fun AppearanceScreen(
@@ -64,6 +68,10 @@ fun AppearanceScreen(
         Settings.PREF_NAVBAR_COLOR,
         SettingsWithoutKey.BACKGROUND_IMAGE,
         SettingsWithoutKey.BACKGROUND_IMAGE_LANDSCAPE,
+        Settings.PREFERENCE_BACKGROUND_BRIGHTNESS_DAY_LANDSCAPE,
+        Settings.PREFERENCE_BACKGROUND_BRIGHTNESS_DAY_PORT,
+        Settings.PREFERENCE_BACKGROUND_BRIGHTNESS_NIGHT_LANDSCAPE,
+        Settings.PREFERENCE_BACKGROUND_BRIGHTNESS_NIGHT_PORT,
         R.string.settings_category_miscellaneous,
         Settings.PREF_ENABLE_SPLIT_KEYBOARD,
         Settings.PREF_ENABLE_SPLIT_KEYBOARD_LANDSCAPE,
@@ -87,8 +95,6 @@ fun AppearanceScreen(
         Settings.PREF_AUTO_FOLD_THEME,
         Settings.PREF_AUTO_FOLD_SPLIT,
         Settings.PREF_TREAT_HALF_OPENED_AS_FOLDED,
-
-
 
     )
     SearchSettingsScreen(
@@ -200,6 +206,79 @@ fun createAppearanceSettings(context: Context) = listOf(
     {
         BackgroundImagePref(it, true)
     },
+    Setting(context, Settings.PREFERENCE_BACKGROUND_BRIGHTNESS_DAY_PORT, R.string.customize_background_brightness_day_port) { setting ->
+        SliderPreference(
+            name = setting.title,
+            key = setting.key,
+            default = 1.0f,
+            range = 0f..1f,
+            description = { "${(100 * it).toInt()}%" }
+        ) {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+            val value = it
+            prefs.edit().putFloat(setting.key, value).apply() // 👈 FORCE SAVE
+            Log.d("SliderDebug", "Forced write to prefs key=${setting.key}, value=$value")
+
+            Settings.clearCachedBackgroundImages()
+            KeyboardSwitcher.getInstance().setThemeNeedsReload()
+        }
+    },
+
+    Setting(context, Settings.PREFERENCE_BACKGROUND_BRIGHTNESS_DAY_LANDSCAPE, R.string.customize_background_brightness_day_land) { setting ->
+        SliderPreference(
+            name = setting.title,
+            key = setting.key,
+            default = 1.0f,
+            range = 0f..1f,
+            description = { "${(100 * it).toInt()}%" }
+        ) {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+            val value = it
+            prefs.edit().putFloat(setting.key, value).apply()
+            Log.d("SliderDebug", "Forced write to prefs key=${setting.key}, value=$value")
+
+            Settings.clearCachedBackgroundImages()
+            KeyboardSwitcher.getInstance().setThemeNeedsReload()
+        }
+    },
+
+    Setting(context, Settings.PREFERENCE_BACKGROUND_BRIGHTNESS_NIGHT_PORT, R.string.customize_background_brightness_night_port) { setting ->
+        SliderPreference(
+            name = setting.title,
+            key = setting.key,
+            default = 1.0f,
+            range = 0f..1f,
+            description = { "${(100 * it).toInt()}%" }
+        ) {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+            val value = it
+            prefs.edit().putFloat(setting.key, value).apply()
+            Log.d("SliderDebug", "Forced write to prefs key=${setting.key}, value=$value")
+
+            Settings.clearCachedBackgroundImages()
+            KeyboardSwitcher.getInstance().setThemeNeedsReload()
+        }
+    },
+
+    Setting(context, Settings.PREFERENCE_BACKGROUND_BRIGHTNESS_NIGHT_LANDSCAPE, R.string.customize_background_brightness_night_land) { setting ->
+        SliderPreference(
+            name = setting.title,
+            key = setting.key,
+            default = 1.0f,
+            range = 0f..1f,
+            description = { "${(100 * it).toInt()}%" }
+        ) {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+            val value = it
+            prefs.edit().putFloat(setting.key, value).apply()
+            Log.d("SliderDebug", "Forced write to prefs key=${setting.key}, value=$value")
+
+            Settings.clearCachedBackgroundImages()
+            KeyboardSwitcher.getInstance().setThemeNeedsReload()
+        }
+    },
+
+
     Setting(context, Settings.PREF_ENABLE_SPLIT_KEYBOARD, R.string.enable_split_keyboard) {
         SwitchPreference(it, Defaults.PREF_ENABLE_SPLIT_KEYBOARD) { KeyboardSwitcher.getInstance().reloadKeyboard() }
     },

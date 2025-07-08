@@ -11,20 +11,30 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.preference.PreferenceManager;
 import android.view.ContextThemeWrapper;
 import android.view.inputmethod.EditorInfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+
 
 import helium314.keyboard.compat.ConfigurationCompatKt;
 import helium314.keyboard.keyboard.KeyboardActionListener;
 import helium314.keyboard.latin.AudioAndHapticFeedbackManager;
+import helium314.keyboard.latin.BuildConfig;
 import helium314.keyboard.latin.InputAttributes;
 import helium314.keyboard.latin.R;
 import helium314.keyboard.latin.utils.DeviceProtectedUtils;
@@ -74,6 +84,17 @@ public final class Settings implements SharedPreferences.OnSharedPreferenceChang
     public static boolean readShiftBackspaceDeleteRightEnabled() {
         return mPrefs.getBoolean(PREF_ENABLE_SHIFT_BACKSPACE_DELETE_RIGHT, false);
     }
+
+    public static final String PREF_FORCE_IME_SHOW = "force_ime_show";
+
+    public boolean readForceImeShowEnabled() {
+        // Always true for debug builds unless explicitly disabled
+        if (BuildConfig.DEBUG) {
+            return mPrefs.getBoolean(PREF_FORCE_IME_SHOW, true);
+        }
+        return mPrefs.getBoolean(PREF_FORCE_IME_SHOW, false);
+    }
+
 
 
 
@@ -477,22 +498,102 @@ public final class Settings implements SharedPreferences.OnSharedPreferenceChang
         }
     }
 
-    @Nullable public static Drawable readUserBackgroundImage(final Context context, final boolean night) {
+
+    /*public static float readBackgroundBrightness(Context context, boolean night, boolean landscape) {
+        String key = "background_brightness_" + (night ? "night" : "day") + "_" + (landscape ? "land" : "port");
+        float brightness = context.getSharedPreferences("inputmethod", Context.MODE_PRIVATE).getFloat(key, 1.0f);
+        Log.d("BackgroundDebug", "Brightness read from prefs: " + brightness + " for key: " + key);
+        return brightness;
+    }*/
+
+
+    /*public static float writeBackgroundBrightness(Context context, boolean night, boolean landscape) {
+        String key = "background_brightness_" + (night ? "night" : "day") + "_" + (landscape ? "land" : "port");
+        return context.getSharedPreferences("inputmethod", Context.MODE_PRIVATE).setFloat(key, 1.0f);
+    }*/
+
+    public static final String PREFERENCE_BACKGROUND_BRIGHTNESS_DAY_PORT= "background_brightness_day_port";
+    public static final String PREFERENCE_BACKGROUND_BRIGHTNESS_DAY_LANDSCAPE= "background_brightness_day_land";
+    public static final String PREFERENCE_BACKGROUND_BRIGHTNESS_NIGHT_PORT= "background_brightness_night_port";
+    public static final String PREFERENCE_BACKGROUND_BRIGHTNESS_NIGHT_LANDSCAPE= "background_brightness_night_land";
+
+    public static float readBackgroundBrightness(Context context, String key) {
+        float value = PreferenceManager.getDefaultSharedPreferences(context).getFloat(key, 1.0f);
+        Log.d("BackgroundDebug", "Brightness read from default prefs: " + value + " for key: " + key);
+        return value;
+    }
+
+
+
+
+    @Nullable
+    public static Drawable readUserBackgroundImage(final Context context, final boolean night) {
         final boolean landscape = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         final int index = (night ? 1 : 0) + (landscape ? 2 : 0);
-        if (sCachedBackgroundImages[index] != null) return sCachedBackgroundImages[index];
+        Log.d("BackgroundDebug", "Called readUserBackgroundImage: night=" + night + ", landscape=" + landscape);
+
+        if (sCachedBackgroundImages[index] != null) {
+            Log.d("BackgroundDebug", "Returning cached background image for index: " + index);
+            return sCachedBackgroundImages[index];
+        }
 
         File image = getCustomBackgroundFile(context, night, landscape);
-        if (!image.isFile() && landscape)
-            image = getCustomBackgroundFile(context, night, false); // fall back to portrait image for historic reasons
-        if (!image.isFile()) return null;
+        if (!image.isFile() && landscape) {
+            Log.d("BackgroundDebug", "Landscape image not found, falling back to portrait.");
+            image = getCustomBackgroundFile(context, night, false);
+        }
+        if (!image.isFile()) {
+            Log.d("BackgroundDebug", "No background image file found.");
+            return null;
+        }
+
         try {
-            sCachedBackgroundImages[index] = new BitmapDrawable(context.getResources(), BitmapFactory.decodeFile(image.getAbsolutePath()));
+            Bitmap original = BitmapFactory.decodeFile(image.getAbsolutePath());
+            if (original == null) {
+                Log.d("BackgroundDebug", "BitmapFactory.decodeFile returned null.");
+                return null;
+            }
+
+            //float brightness = readBackgroundBrightness(context, night, landscape);
+            String key = "background_brightness_" + (night ? "night" : "day") + "_" + (landscape ? "land" : "port");
+            float brightness = readBackgroundBrightness(context, key);
+            //float brightness = Settings.readBackgroundBrightness(context, Settings.PREFERENCE_BACKGROUND_BRIGHTNESS_DAY_PORT);
+
+
+            Log.d("BackgroundDebug", "Brightness read from prefs: " + brightness);
+
+            if (brightness < 0.99f || brightness > 1.01f) {
+                Log.d("BackgroundDebug", "Applying brightness adjustment.");
+                Bitmap mutableBitmap = Bitmap.createBitmap(original.getWidth(), original.getHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(mutableBitmap);
+                Paint paint = new Paint();
+
+                ColorMatrix colorMatrix = new ColorMatrix(new float[]{
+                    brightness, 0, 0, 0, 0,
+                    0, brightness, 0, 0, 0,
+                    0, 0, brightness, 0, 0,
+                    0, 0, 0, 1, 0
+                });
+
+                paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
+                canvas.drawBitmap(original, 0, 0, paint);
+
+                sCachedBackgroundImages[index] = new BitmapDrawable(context.getResources(), mutableBitmap);
+            } else {
+                Log.d("BackgroundDebug", "Brightness is default, using original image.");
+                sCachedBackgroundImages[index] = new BitmapDrawable(context.getResources(), original);
+            }
+
             return sCachedBackgroundImages[index];
         } catch (Exception e) {
+            Log.e("BackgroundDebug", "Exception during background processing", e);
             return null;
         }
     }
+
+
+
+
 
     public static File getCustomBackgroundFile(final Context context, final boolean night, final boolean landscape) {
         return new File(DeviceProtectedUtils.getFilesDir(context), "custom_background_image" + (landscape ? "_landscape" : "") + (night ? "_night" : ""));
@@ -514,6 +615,7 @@ public final class Settings implements SharedPreferences.OnSharedPreferenceChang
         wrapper.applyOverrideConfiguration(config);
         return wrapper;
     }
+
 
     public boolean isTablet() {
         return mContext.getResources().getInteger(R.integer.config_screen_metrics) >= 3;

@@ -93,6 +93,17 @@ SPDX-License-Identifier: Apache-2.0 AND GPL-3.0-only
             </intent-filter>
         </receiver>
 
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:fitsSystemWindows="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+
+
+
+
+
+
     </application>
 
     <queries>

@@ -81,4 +81,9 @@ object SettingsWithoutKey {
     const val BACKGROUND_IMAGE = "background_image"
     const val BACKGROUND_IMAGE_LANDSCAPE = "background_image_landscape"
     const val CUSTOM_FONT = "custom_font"
+    const val CUSTOMIZE_BACKGROUND_BRIGHTNESS      = "customize_background_brightness"
+    const val BACKGROUND_BRIGHTNESS_DAY_PORT       = "background_brightness_day_port"
+    const val BACKGROUND_BRIGHTNESS_DAY_LANDSCAPE  = "background_brightness_day_land"
+    const val BACKGROUND_BRIGHTNESS_NIGHT_PORT     = "background_brightness_night_port"
+    const val BACKGROUND_BRIGHTNESS_NIGHT_LANDSCAPE= "background_brightness_night_land"
 }
